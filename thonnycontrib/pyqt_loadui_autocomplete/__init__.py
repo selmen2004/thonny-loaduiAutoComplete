@@ -14,7 +14,7 @@ from xml.dom import minidom
 
 
 logger = getLogger(__name__)
-logger.setLevel(logger.disabled)
+logger.setLevel(51)#disable logging
 
 WIDGET_CACHE = {}
 last_editor = editor_helpers.get_active_text_widget()
@@ -377,12 +377,17 @@ def load_plugin() -> None:
     # Check if another autocomplete plugin is already loaded
     for command in get_workbench()._commands:
         #print("Checking command:", command)
+        print( command["command_id"])
+        print( command["handler"].__module__ , command["handler"].__name__ ,command["handler"].__qualname__,command["handler"].__code__)
         if command["command_id"] == "autocomplete" and command["handler"].__module__ != __name__:
             # If found, unbind the other plugin's handlers
-            logger.info("Removing existing autocomplete plugin")
-            get_workbench().unbind("editor_autocomplete_response", command["handler"])
-            get_workbench().unbind("shell_autocomplete_response", command["handler"])
-            get_workbench().unbind("get_completion_details_response")
+            #@TODO : make this more robust 
+            logger.info("trying to remove existing autocomplete plugin")
+            try:
+                get_workbench().unbind("editor_autocomplete_response", command["handler"])
+                get_workbench().unbind("shell_autocomplete_response", command["handler"])
+                get_workbench().unbind("get_completion_details_response")
+            except:...
             
             # Remove the existing command
             del command
